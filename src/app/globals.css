@@ -2,6 +2,11 @@
 
 @custom-variant dark (&:is(.dark *));
 
+body {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 500;
+}
+
 :root {
   --radius: 0.625rem;
   --background: oklch(1 0 0);
