@@ -34,7 +34,7 @@ export function FormForget({setChoiseForgetPass}: {setChoiseForgetPass: React.Di
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="w-96 space-y-6 p-10 bg-neutral-100 rounded-2xl shadow-2xl border">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="w-96 space-y-6 p-10 bg-neutral-100 rounded-2xl shadow-2xl border my-20">
         <p className="text-center font-semibold text-3xl">Quên mật khẩu</p>
         <FormField
           control={form.control}
