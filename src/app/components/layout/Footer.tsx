@@ -6,7 +6,7 @@ import { CiBank } from "react-icons/ci";
 
 export default function Footer() {
   return (
-    <div>
+    <div className="text-gray-400">
       <div className="py-6 border-t grid grid-cols-2">
         <div>
           <Logo />
