@@ -1,1 +1,1 @@
-export const CLIENT_ID = process.env.CLIENT_ID
+export const NEXT_PUBLIC_URL_DB = process.env.NEXT_PUBLIC_URL_DB

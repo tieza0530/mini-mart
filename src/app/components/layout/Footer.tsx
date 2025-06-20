@@ -1,3 +1,5 @@
+"use client"
+
 import { IframeMaps } from "./components/IframeMaps";
 import { Logo } from "./components/Logo";
 import { FaFacebookSquare } from "react-icons/fa";
