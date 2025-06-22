@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { ListCategory } from "./components/home/ListCategory";
 import { getCategory } from "./components/home/components/getCategory";
 import { CategoryProps } from "./components/home/components/type.category";
+import { CarouselHome } from "./components/home/CarouselHome";
+import { ServicesHint } from "./components/home/ServicesHint";
 
 export default function Home() {
   const [listCategories, setCategories] = useState<CategoryProps[] | null>(null);
@@ -27,6 +29,8 @@ export default function Home() {
         ))}
       </div> :
         <ListCategory listCategories={listCategories} />}
+        <CarouselHome/>
+        <ServicesHint/>
     </div>
   );
 }
