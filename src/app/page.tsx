@@ -23,8 +23,8 @@ export default function Home() {
   }, []);
   return (
     <div>
-      {!listCategories ? <div className="grid grid-cols-6 gap-2">
-        {[...Array(18)].map((_, idx) => (
+      {!listCategories ? <div className="grid grid-cols-4 gap-2">
+        {[...Array(16)].map((_, idx) => (
           <div key={idx} className="h-28 bg-gray-200 animate-pulse rounded-3xl"></div>
         ))}
       </div> :

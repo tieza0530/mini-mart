@@ -16,7 +16,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return (
         <AuthContext.Provider value={{ dataUser, setDataUser }} >
              <SessionProvider>
-            <div className="h-screen flex flex-col justify-between max-[1540px]:mx-40 mx-96">
+            <div className="h-screen flex flex-col justify-between max-[1540px]:mx-36 mx-96">
                 <Header />
                 <div className="my-10">
                 {children}

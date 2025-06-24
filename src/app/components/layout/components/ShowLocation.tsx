@@ -1,5 +1,5 @@
 "use client"
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { IoLocationOutline } from "react-icons/io5";
 import {
   Select,
@@ -8,10 +8,24 @@ import {
   SelectValue,
   SelectTrigger,
 } from "@/components/ui/select"
+import { getAddressUser } from "./getAddressUser";
 
 export const ShowLocation = () => {
   const [ userAddress, setUserAddress ] = useState('');
-  
+  useEffect(() => {
+    navigator.geolocation.getCurrentPosition( async (posision) => {
+      const { latitude , longitude } = posision.coords;
+      const address = await getAddressUser(latitude, longitude);
+      console.log(address);
+      
+    }, 
+    (error) => {
+          console.error('Lỗi lấy vị trí:', error.message);
+    },
+    {enableHighAccuracy: true}
+  )
+    
+  }, [])
   return (
     <div className="ml-2 flex items-center">
       <Select value={userAddress} onValueChange={setUserAddress}>
