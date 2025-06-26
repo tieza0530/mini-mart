@@ -20,6 +20,9 @@ import { FaFacebook } from "react-icons/fa";
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { HandleShowPass } from "../../../helper/showPass"
+import axios from "axios"
+import { NEXT_PUBLIC_URL_DB } from "@/app/helper/contant"
+import { useAuth } from "@/app/components/layout/AuthProvider"
 
 const FormSchema = z.object({
     username: z.string().trim().toLowerCase().regex(/^([a-z_][a-z0-9_]{2,15}|[^\s@]+@[^\s@]+\.[^\s@]+)$/),
@@ -28,6 +31,7 @@ const FormSchema = z.object({
 
 export function FormLogin({ setChoiseForgetPass }: { setChoiseForgetPass: React.Dispatch<React.SetStateAction<boolean>> }) {
     const [showPass, setShowPass] = useState(false);
+    const { setDataUser , setAccessToken} = useAuth()
     const route = useRouter()
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
@@ -37,9 +41,18 @@ export function FormLogin({ setChoiseForgetPass }: { setChoiseForgetPass: React.
         },
     })
 
-    function onSubmit(data: z.infer<typeof FormSchema>) {
-        console.log(data);
-
+    async function onSubmit(data: z.infer<typeof FormSchema>) {
+        const res = await axios.post(`${NEXT_PUBLIC_URL_DB}/v1/auth/login`, {
+            username: data.username,
+            password: data.password
+        }, {
+            withCredentials: true
+        })
+        if(res.status === 200){
+            setDataUser(res.data.data)
+            setAccessToken(res.data.accessToken)
+            route.push('/')
+        }
         toast.success("You submitted the following values", { duration: 1000 })
     }
 

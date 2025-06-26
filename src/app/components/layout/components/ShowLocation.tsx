@@ -27,9 +27,9 @@ export const ShowLocation = () => {
     
   }, [])
   return (
-    <div className="ml-2 flex items-center">
+    <div>
       <Select value={userAddress} onValueChange={setUserAddress}>
-        <SelectTrigger className="rounded-4xl p-5 ">
+        <SelectTrigger className="rounded-4xl p-5 hover:bg-neutral-100 cursor-pointer transition ">
             <IoLocationOutline className="h-6 w-6 text-neutral-600"/>
             <SelectValue placeholder="Địa chỉ" className="truncate "/>
         </SelectTrigger>
