@@ -16,21 +16,25 @@ import { cn } from "@/lib/utils";
 import { ShowLocation } from "./components/ShowLocation";
 import axios from "axios";
 import { NEXT_PUBLIC_URL_DB } from "@/app/helper/contant";
+import { ToastContainer, toast } from "react-toastify";
 
 export default function Header() {
-    const { data: session } = useSession()    
+    const { data: session } = useSession()
     const { dataUser, accessToken } = useAuth()
-    
+
     const searchUrl = usePathname()
     const route = useRouter()
-    const handleLogin = async() => {
+    const handleLogin = async () => {
         const res = await axios.post(`${NEXT_PUBLIC_URL_DB}/v1/auth/logout`, {
             accessToken,
         }, {
             withCredentials: true
+
         })
-        if(res.status === 200){
-           window.location.reload()
+        if (res.status === 200) {
+            window.location.reload()
+        } else {
+            toast.success("Lỗi hệ thống!", { autoClose: 1500 })
         }
     }
     return (
@@ -86,9 +90,10 @@ export default function Header() {
                     }
                 </div>
                 <div className="w-auto flex justify-end mt-2 h-10">
-                    <ShowLocation/>
+                    <ShowLocation />
                 </div>
             </div>
+            <ToastContainer />
         </div>
     );
 }

@@ -2,7 +2,6 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { toast, Toaster } from "sonner"
 import { z } from "zod"
 
 import { Button } from "@/components/ui/button"
@@ -23,15 +22,17 @@ import { HandleShowPass } from "../../../helper/showPass"
 import axios from "axios"
 import { NEXT_PUBLIC_URL_DB } from "@/app/helper/contant"
 import { useAuth } from "@/app/components/layout/AuthProvider"
+import { ToastContainer, toast } from 'react-toastify';
 
 const FormSchema = z.object({
-    username: z.string().trim().toLowerCase().regex(/^([a-z_][a-z0-9_]{2,15}|[^\s@]+@[^\s@]+\.[^\s@]+)$/),
+    username: z.string().trim().toLowerCase().regex(/^([a-z_][a-z0-9_]{2,15}|[^\s@]+@[^\s@]+\.[^\s@]+)$/).max(30),
     password: z.string().trim()
 })
 
 export function FormLogin({ setChoiseForgetPass }: { setChoiseForgetPass: React.Dispatch<React.SetStateAction<boolean>> }) {
     const [showPass, setShowPass] = useState(false);
-    const { setDataUser , setAccessToken} = useAuth()
+    const { setDataUser, setAccessToken } = useAuth()
+    const [isWait, setIsWait] = useState(false)
     const route = useRouter()
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
@@ -42,18 +43,33 @@ export function FormLogin({ setChoiseForgetPass }: { setChoiseForgetPass: React.
     })
 
     async function onSubmit(data: z.infer<typeof FormSchema>) {
-        const res = await axios.post(`${NEXT_PUBLIC_URL_DB}/v1/auth/login`, {
-            username: data.username,
-            password: data.password
-        }, {
-            withCredentials: true
-        })
-        if(res.status === 200){
-            setDataUser(res.data.data)
-            setAccessToken(res.data.accessToken)
-            route.push('/')
+        try {
+            if (isWait) return
+            setIsWait(true)
+            const res = await axios.post(`${NEXT_PUBLIC_URL_DB}/v1/auth/login`, {
+                username: data.username,
+                password: data.password
+            }, {
+                withCredentials: true,
+                validateStatus: () => true
+            })
+            if (res.status === 200) {
+                setDataUser(res.data.data)
+                setAccessToken(res.data.accessToken)
+                route.push('/')
+            } else if (res.status === 404) {
+                toast.error("Tài khoản không tồn tại!", { autoClose: 1500 })
+            } else if (res.status === 401) {
+                toast.error("Sai tài khoản hoặc mật khẩu!", { autoClose: 1500 })
+            } else {
+                toast.error("Lỗi hệ thống!", { autoClose: 1500 })
+            }
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setIsWait(false)
         }
-        toast.success("You submitted the following values", { duration: 1000 })
+
     }
 
     return (
@@ -80,9 +96,9 @@ export function FormLogin({ setChoiseForgetPass }: { setChoiseForgetPass: React.
                             <FormLabel>Mật khẩu</FormLabel>
                             <FormControl>
                                 <div className="relative">
-                                    <Input type={showPass? "text" : "password"} placeholder="Nhập mật khẩu" {...field} />
+                                    <Input type={showPass ? "text" : "password"} placeholder="Nhập mật khẩu" {...field} />
                                     <div className="absolute top-1/2 right-0 -translate-y-1/2 -translate-x-1/2">
-                                    <HandleShowPass showPass={showPass} setShowPass={setShowPass} />
+                                        <HandleShowPass showPass={showPass} setShowPass={setShowPass} />
                                     </div>
                                 </div>
                             </FormControl>
@@ -101,7 +117,7 @@ export function FormLogin({ setChoiseForgetPass }: { setChoiseForgetPass: React.
                 </div>
                 <p className="text-center text-xs mb-0 font-normal hover:text-blue-500 cursor-pointer hover:underline" onClick={() => route.push('/register')}>Đăng ký tài khoản ?</p>
             </form>
-            <Toaster />
+            <ToastContainer />
         </Form>
     )
 }
