@@ -1,1 +1,2 @@
 export const NEXT_PUBLIC_URL_DB = process.env.NEXT_PUBLIC_URL_DB
+export const NEXT_PUBLIC_GEOCODING_API = process.env.NEXT_PUBLIC_GEOCODING_API

@@ -2,7 +2,6 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { toast, Toaster } from "sonner"
 import { z } from "zod"
 
 import { Button } from "@/components/ui/button"
@@ -17,10 +16,14 @@ import { Input } from "@/components/ui/input"
 import { useRouter } from "next/navigation"
 import { HandleShowPass } from "../../../helper/showPass"
 import { useState } from "react"
+import axios from "axios"
+import { NEXT_PUBLIC_URL_DB } from "@/app/helper/contant"
+import { useAuth } from "@/app/components/layout/AuthProvider"
+import { ToastContainer, toast } from 'react-toastify';
 
 const FormSchema = z.object({
-    username: z.string().min(2).regex(/^[a-zA-Z0-9_]+$/),
-    email: z.string().trim().email(),
+    username: z.string().min(2).max(30).toLowerCase().regex(/^([a-z_][a-z0-9_]{2,15}|[^\s@]+@[^\s@]+\.[^\s@]+)$/),
+    email: z.string().max(100).trim().email(),
     password: z.string().min(6).regex(/^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/),
     passwordAgain: z.string().min(6).regex(/^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/),
 })
@@ -31,18 +34,45 @@ const FormSchema = z.object({
 export function FormRegister() {
     const [showPass, setShowPass] = useState(false);
     const [showPassAgain, setShowPassAgain] = useState(false);
-
+    const [isWait, setIsWait] = useState(false)
+    const { setDataUser } = useAuth()
     const route = useRouter()
+
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
         defaultValues: {
             username: "",
+            email: "",
+            password: "",
+            passwordAgain: "",
         },
     })
 
-    function onSubmit(data: z.infer<typeof FormSchema>) {
-        console.log(data);
-        toast("You submitted the following values")
+    async function onSubmit(data: z.infer<typeof FormSchema>) {
+        try {
+            if (isWait) return
+            setIsWait(true)
+            const res = await axios.post(`${NEXT_PUBLIC_URL_DB}/v1/auth/register`, {
+                email: data.email,
+                account: data.username,
+                password: data.passwordAgain,
+            }, {
+                withCredentials: true,
+                validateStatus: () => true
+            })
+            if (res.status === 200) {
+                setDataUser(res.data.data);
+                route.push('/')
+            } else if (res.status === 409) {
+                toast.error("Tài khoản hoặc Email đã tồn tại!", { autoClose: 1500 })
+            } else {
+                toast.error("Lỗi hệ thống!", { autoClose: 1500 })
+            }
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setIsWait(false)
+        }
     }
 
     return (
@@ -68,7 +98,7 @@ export function FormRegister() {
                         <FormItem>
                             <FormLabel>Email</FormLabel>
                             <FormControl>
-                                <Input placeholder="Nhập Email" {...field} />
+                                <Input placeholder="Nhập Email"  {...field} />
                             </FormControl>
                         </FormItem>
                     )}
@@ -110,7 +140,7 @@ export function FormRegister() {
                 <Button type="submit" className="w-full text-lg mt-2 py-6 bg-teal-400 hover:bg-teal-500 ">Đăng ký</Button>
                 <p className="text-center text-xs mb-0 font-normal hover:text-blue-500 cursor-pointer hover:underline" onClick={() => route.push('/login')}>Quay lại Đăng nhập !</p>
             </form>
-            <Toaster />
+            <ToastContainer />
         </Form>
     )
 }
