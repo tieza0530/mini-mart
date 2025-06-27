@@ -9,10 +9,15 @@ import {
   SelectTrigger,
 } from "@/components/ui/select"
 import { getAddressUser } from "./getAddressUser";
+import { useSession } from "next-auth/react";
+import { useAuth } from "../AuthProvider";
 
 export const ShowLocation = () => {
   const [ userAddress, setUserAddress ] = useState('');
+      const { data: session } = useSession()
+      const { dataUser } = useAuth()
   useEffect(() => {
+    if( !dataUser?.Address || !session?.user) return
     navigator.geolocation.getCurrentPosition( async (posision) => {
       const { latitude , longitude } = posision.coords;
       const address = await getAddressUser(latitude, longitude);
@@ -25,7 +30,7 @@ export const ShowLocation = () => {
     {enableHighAccuracy: true}
   )
     
-  }, [])
+  }, [dataUser, session])
   return (
     <div>
       <Select value={userAddress} onValueChange={setUserAddress}>
